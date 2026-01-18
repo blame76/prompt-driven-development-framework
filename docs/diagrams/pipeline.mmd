@@ -1,1 +1,10 @@
-//init
+flowchart TD
+  A[Ziel definieren] --> B[Prüfbarkeit herstellen]
+  B --> C[Annahmen explizit machen]
+  C --> D[Verantwortung klären]
+  D --> E[Prompt formulieren]
+  E --> F[Ergebnis prüfen]
+  F --> G{Erfüllt?}
+  G -->|Nein| H[Iteration mit Lernschleife]
+  H --> E
+  G -->|Ja| I[Artefakt erstellen]
