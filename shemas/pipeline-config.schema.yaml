@@ -1,1 +1,142 @@
-//Referenzschema
+# schemas/pipeline-config.schema.yaml
+# Referenzschema für die PDD Pipeline-Konfiguration
+# Dieses Schema beschreibt die Struktur einer Pipeline-Konfiguration,
+# nicht deren technische Implementierung.
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: "PDD Pipeline Configuration Schema"
+description: >
+  Meta-Schema für die Konfiguration einer Prompt-Driven-Development-Pipeline.
+  Definiert Workflow-Schritte, Gates, Metriken, Eskalationspfade und Defaults.
+  Tool-agnostisch, zukunftssicher und unabhängig von konkreten Implementierungen.
+
+type: object
+required:
+  - version
+  - workflow
+  - gates
+  - metrics
+  - escalation_paths
+
+properties:
+
+  version:
+    type: string
+    description: "Version der Pipeline-Konfiguration."
+
+  workflow:
+    type: object
+    description: "Definition der Pipeline-Schritte und deren Reihenfolge."
+    required:
+      - steps
+    properties:
+      steps:
+        type: array
+        description: "Lineare oder verzweigte Abfolge der Pipeline-Schritte."
+        items:
+          type: object
+          required:
+            - id
+            - name
+            - description
+          properties:
+            id:
+              type: string
+              description: "Eindeutige ID des Schritts."
+            name:
+              type: string
+              description: "Lesbarer Name des Schritts."
+            description:
+              type: string
+              description: "Zweck des Schritts."
+            next:
+              type: array
+              description: "Liste der nächsten möglichen Schritte (für verzweigte Workflows)."
+              items:
+                type: string
+
+  gates:
+    type: array
+    description: "Definition der Qualitäts- und Verantwortungs-Gates."
+    items:
+      type: object
+      required:
+        - id
+        - name
+        - type
+        - policy
+      properties:
+        id:
+          type: string
+          description: "Eindeutige Gate-ID."
+        name:
+          type: string
+          description: "Lesbarer Name des Gates."
+        type:
+          type: string
+          enum: ["deterministic", "llm_judge"]
+          description: >
+            deterministic = regelbasiert, reproduzierbar.
+            llm_judge = KI-basierte Bewertung, nur ergänzend.
+        policy:
+          type: string
+          description: "Referenz auf eine Policy (z. B. clarity, validation, responsibility)."
+        threshold:
+          type: number
+          description: "Schwellwert für Bestehen (0.0–1.0)."
+        description:
+          type: string
+        on_fail:
+          type: string
+          description: "Eskalationspfad oder Aktion bei Nichtbestehen."
+
+  metrics:
+    type: object
+    description: "Definition der Metriken zur Bewertung der Pipeline-Qualität."
+    properties:
+      clarity_score:
+        type: string
+        description: "Messidee für Klarheit (z. B. Anzahl expliziter Annahmen)."
+      validation_coverage:
+        type: string
+        description: "Abdeckung der Prüfkriterien."
+      responsibility_breaches:
+        type: string
+        description: "Anzahl der Verstöße gegen Verantwortungsgrenzen."
+      iteration_depth:
+        type: string
+        description: "Anzahl der Iterationen bis zum Artefakt."
+
+  escalation_paths:
+    type: array
+    description: "Definition möglicher Eskalationspfade."
+    items:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        actions:
+          type: array
+          items:
+            type: string
+
+  defaults:
+    type: object
+    description: "Optionale Default-Werte für Gates, Metriken oder Workflow."
+    properties:
+      risk_level:
+        type: string
+        enum: ["low", "medium", "high"]
+      gate_threshold:
+        type: number
+        description: "Standard-Schwellenwert für Gates."
+      max_iterations:
+        type: number
+        description: "Maximale Anzahl erlaubter Iterationen."
