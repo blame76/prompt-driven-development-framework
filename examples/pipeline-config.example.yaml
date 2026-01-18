@@ -1,0 +1,120 @@
+# examples/pipeline-config.example.yaml
+# Beispielkonfiguration für eine PDD-Pipeline
+
+version: "1.0.0"
+
+workflow:
+  steps:
+    - id: goal
+      name: "Ziel definieren"
+      description: "Präzises, abgegrenztes Ziel formulieren."
+      next: ["testability"]
+
+    - id: testability
+      name: "Prüfbarkeit herstellen"
+      description: "Kriterien definieren, die objektiv überprüfbar sind."
+      next: ["assumptions"]
+
+    - id: assumptions
+      name: "Annahmen explizit machen"
+      description: "Alle relevanten Annahmen sichtbar machen."
+      next: ["responsibility"]
+
+    - id: responsibility
+      name: "Verantwortung klären"
+      description: "Rollen und Entscheidungsgrenzen definieren."
+      next: ["prompt"]
+
+    - id: prompt
+      name: "Prompt formulieren"
+      description: "Ziel, Kontext, Anforderungen, Format und Ausschlüsse definieren."
+      next: ["evaluation"]
+
+    - id: evaluation
+      name: "Ergebnis prüfen"
+      description: "Ergebnis gegen Kriterien, Annahmen und Verantwortung bewerten."
+      next: ["iteration", "artifact"]
+
+    - id: iteration
+      name: "Iteration mit Lernschleife"
+      description: "Hypothese, Änderung, Erwartung, Vergleich."
+      next: ["prompt"]
+
+    - id: artifact
+      name: "Artefakt erstellen"
+      description: "Ergebnis versionieren, dokumentieren und finalisieren."
+      next: []
+
+gates:
+  - id: clarity_gate
+    name: "Clarity Gate"
+    type: "deterministic"
+    policy: "clarity"
+    threshold: 0.8
+    description: "Prüft, ob Ziel, Kontext und Anforderungen eindeutig sind."
+    on_fail: "clarity_escalation"
+
+  - id: responsibility_gate
+    name: "Responsibility Gate"
+    type: "deterministic"
+    policy: "responsibility"
+    threshold: 1.0
+    description: "Stellt sicher, dass keine Entscheidungen an die KI delegiert wurden."
+    on_fail: "responsibility_escalation"
+
+  - id: validation_gate
+    name: "Validation Gate"
+    type: "llm_judge"
+    policy: "validation"
+    threshold: 0.85
+    description: "Bewertet die Prüfbarkeit und Einhaltung der Kriterien."
+    on_fail: "validation_escalation"
+
+  - id: decomposition_gate
+    name: "Decomposition Gate"
+    type: "llm_judge"
+    policy: "decomposition"
+    threshold: 0.75
+    description: "Prüft, ob komplexe Aufgaben sinnvoll zerlegt wurden."
+    on_fail: "decomposition_escalation"
+
+metrics:
+  clarity_score: "Anzahl expliziter Annahmen / unklare Begriffe"
+  validation_coverage: "Prozent der Kriterien, die erfüllt und testbar sind"
+  responsibility_breaches: "Anzahl der Verstöße gegen Verantwortungsgrenzen"
+  iteration_depth: "Anzahl der Iterationen bis zum Artefakt"
+
+escalation_paths:
+  - id: clarity_escalation
+    name: "Clarity Review"
+    description: "Menschliche Überarbeitung der Ziel- und Kontextdefinition."
+    actions:
+      - "Review Ziel"
+      - "Review Kontext"
+      - "Review Anforderungen"
+
+  - id: responsibility_escalation
+    name: "Responsibility Enforcement"
+    description: "Entscheidungen werden explizit dem Menschen zugeordnet."
+    actions:
+      - "Entferne implizite KI-Entscheidungen"
+      - "Dokumentiere Verantwortungsgrenzen"
+
+  - id: validation_escalation
+    name: "Validation Deep Review"
+    description: "Vertiefte Prüfung der Kriterien und Ergebnisse."
+    actions:
+      - "Analyse der Prüfkriterien"
+      - "Überarbeitung der Spezifikation"
+
+  - id: decomposition_escalation
+    name: "Decomposition Refinement"
+    description: "Komplexe Aufgaben werden weiter zerlegt."
+    actions:
+      - "Identifiziere Teilaufgaben"
+      - "Erstelle Abhängigkeitsgraph"
+
+defaults:
+  risk_level: "medium"
+  gate_threshold: 0.8
+  max_iterations: 5
