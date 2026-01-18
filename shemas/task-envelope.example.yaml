@@ -1,0 +1,100 @@
+# examples/task-envelope.example.yaml
+# Beispiel für einen vollständigen Task Envelope im PDD-Kontext
+
+run_id: "2025-01-17T14:32:11Z-84f2c1"   # eindeutige Ausführungs-ID
+issue_id: "ISSUE-142"                  # Referenz auf das übergeordnete Problem
+task_id: "TASK-142-01"                 # eindeutige Task-ID
+parent_task_id: null                   # null = Root-Task
+
+spec_version: "1.0.0"                  # Version des Task-Envelope-Schemas
+risk_level: "medium"                   # low | medium | high
+
+prompt_hash: "sha256:9f3a1d..."        # Hash des verwendeten Prompts
+output_hash: "sha256:4b22c9..."        # Hash des KI-Ergebnisses
+
+status: "completed"                    # pending | running | failed | completed
+
+metadata:
+  created_at: "2025-01-17T14:32:11Z"
+  created_by: "human"
+  pipeline_step: "validation"
+  tags:
+    - "checkout"
+    - "criteria"
+    - "specification"
+
+context:
+  goal: "Erstellung einer überprüfbaren Liste von Kriterien für einen checkout-fähigen Warenkorb."
+  assumptions:
+    - "Preise sind bereits berechnet."
+    - "Rabatte sind angewendet."
+    - "Verfügbarkeit wird nicht geprüft."
+  exclusions:
+    - "Keine Kundenprofil-Daten."
+    - "Keine Zahlungsinformationen."
+    - "Keine Versandlogik."
+
+inputs:
+  prompt: |
+    Ziel:
+    Erstelle eine überprüfbare Liste von Kriterien, wann ein Warenkorb im E-Commerce
+    als „checkout-fähig“ gilt.
+
+    Kontext:
+    - Preise sind bereits berechnet
+    - Rabatte sind angewendet
+    - Verfügbarkeit wird nicht geprüft
+    - Steuerberechnung ist ausgeschlossen
+    - Versandlogik ist ausgeschlossen
+    - Der Warenkorb enthält mindestens 1 Position
+
+    Anforderungen:
+    - Kriterien müssen eindeutig und testbar sein
+    - Keine impliziten Annahmen
+    - Keine Architektur- oder Implementierungsvorschläge
+    - Keine Best Practices
+
+    Format:
+    - Liste nummerierter Kriterien
+    - Jeder Punkt maximal 1 Satz
+
+outputs:
+  raw: |
+    1. Der Warenkorb enthält mindestens eine Position.
+    2. Jede Position hat einen gültigen Preis.
+    3. Der Gesamtpreis ist größer als 0.
+    4. Alle Positionen sind aktiv und nicht gelöscht.
+    5. Der Warenkorb enthält keine negativen Mengen.
+    6. Der Warenkorb enthält keine ungültigen Rabatte.
+
+  structured:
+    criteria:
+      - "Der Warenkorb enthält mindestens eine Position."
+      - "Jede Position hat einen gültigen Preis."
+      - "Der Gesamtpreis ist größer als 0."
+      - "Alle Positionen sind aktiv und nicht gelöscht."
+      - "Der Warenkorb enthält keine negativen Mengen."
+      - "Der Warenkorb enthält keine ungültigen Rabatte."
+
+artifacts:
+  - type: "specification"
+    path: "examples/cart-checkout-criteria.md"
+    hash: "sha256:1c8f0a..."
+
+evidence:
+  - type: "validation"
+    description: "Alle Kriterien sind eindeutig und testbar."
+    passed: true
+
+  - type: "responsibility_check"
+    description: "Keine impliziten Annahmen oder Geschäftslogik ergänzt."
+    passed: true
+
+  - type: "plausibility_check"
+    description: "Ergebnis wurde nicht aufgrund sprachlicher Qualität akzeptiert."
+    passed: true
+
+escalation:
+  triggered: false
+  reason: null
+  next_step: null
